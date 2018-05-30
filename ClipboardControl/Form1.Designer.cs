@@ -36,12 +36,12 @@
             this.Start = new System.Windows.Forms.Button();
             this.Status = new System.Windows.Forms.Label();
             this.AutoRun = new System.Windows.Forms.CheckBox();
+            this.Monitor = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // 剪切板监控
             // 
-            this.剪切板监控.ContextMenuStrip = this.contextMenuStrip1;
             this.剪切板监控.Icon = ((System.Drawing.Icon)(resources.GetObject("剪切板监控.Icon")));
             this.剪切板监控.Text = "剪切板监控";
             this.剪切板监控.Visible = true;
@@ -53,6 +53,7 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.退出});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.contextMenuStrip1.ShowImageMargin = false;
             this.contextMenuStrip1.Size = new System.Drawing.Size(76, 26);
             // 
@@ -95,12 +96,24 @@
             this.AutoRun.Text = "自动";
             this.AutoRun.UseVisualStyleBackColor = true;
             // 
+            // Monitor
+            // 
+            this.Monitor.AutoSize = true;
+            this.Monitor.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Monitor.ForeColor = System.Drawing.Color.Red;
+            this.Monitor.Location = new System.Drawing.Point(117, 34);
+            this.Monitor.Name = "Monitor";
+            this.Monitor.Size = new System.Drawing.Size(49, 20);
+            this.Monitor.TabIndex = 3;
+            this.Monitor.Text = "等待";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 86);
             this.Controls.Add(this.AutoRun);
+            this.Controls.Add(this.Monitor);
             this.Controls.Add(this.Status);
             this.Controls.Add(this.Start);
             this.DoubleBuffered = true;
@@ -124,5 +137,6 @@
         private System.Windows.Forms.CheckBox AutoRun;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 退出;
+        private System.Windows.Forms.Label Monitor;
     }
 }

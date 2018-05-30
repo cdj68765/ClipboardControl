@@ -54,6 +54,6 @@ namespace ClipboardControl
         public static extern int GetClassNameW(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder lpString, int nMaxCount);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr GetTopWindow(IntPtr hWnd);
+        public static extern IntPtr GetForegroundWindow(IntPtr hWnd);
     }
 }

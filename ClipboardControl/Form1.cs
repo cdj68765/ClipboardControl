@@ -27,7 +27,7 @@ namespace ClipboardControl
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
                 AutoRun.Enabled = false;
-                剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
+              
                 CancelInfoMonitor = new CancellationTokenSource();
                 StartMonitor();
             }
@@ -41,7 +41,7 @@ namespace ClipboardControl
             };
             CancellationTokenSource CloseCheck = new CancellationTokenSource();
             LoopStatus = new Thread(() =>
-           {
+            {
                do
                {
                    if (AutoRun.Checked || ClipboardTask?.IsAlive == true)
@@ -53,7 +53,6 @@ namespace ClipboardControl
                                Status.Text = @"运行中....";
                                Status.ForeColor = Color.Green;
                                Start.Text = @"关闭";
-                               剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
                            }));
                        }
                        else if (ClipboardTask?.IsAlive != true && ClipboardChange?.Status != TaskStatus.Running)
@@ -64,7 +63,6 @@ namespace ClipboardControl
                                Status.ForeColor = Color.Red;
                                CancelInfoClipboard.Cancel();
                                Start.Text = @"启动";
-                               剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
                            }));
                        }
                    }
@@ -74,7 +72,6 @@ namespace ClipboardControl
                        {
                            Invoke(new Action(() =>
                            {
-                               剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
                                Status.Text = @"运行中....";
                                Status.ForeColor = Color.Green;
                                Start.Text = @"关闭";
@@ -87,12 +84,32 @@ namespace ClipboardControl
                                Status.Text = @"关闭中....";
                                Status.ForeColor = Color.Red;
                                Start.Text = @"启动";
-                               剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
+                              
                            }));
                        }
                    }
+                   if (CheckStartClipboardChange)
+                   {
+                       Invoke(new Action(() =>
+                       {
+                           Monitor.Text = @"剪切板监控中";
+                           Monitor.ForeColor = Color.Green;
+                           CheckStartClipboardChange = false;
+                           剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
+                       }));
 
-                   Thread.Sleep(500);
+                   }
+                   else
+                   {
+                       Invoke(new Action(() =>
+                       {
+                           Monitor.Text = @"剪切板未监控";
+                           Monitor.ForeColor = Color.Red;
+                           剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
+
+                       }));
+                   }
+                    Thread.Sleep(500);
                } while (!CloseCheck.IsCancellationRequested);
            });
             this.FormClosing += delegate
@@ -113,34 +130,40 @@ namespace ClipboardControl
              {
                  while (!CancelInfoMonitor.IsCancellationRequested)
                  {
-                     var ret = NativeMethods.EnumWindows((hWnd, lParam) =>
-                     {
-                         StringBuilder GetText = new StringBuilder(256);
-                         NativeMethods.GetWindowTextW(hWnd, GetText, 256);
-                         if (GetText.ToString().StartsWith("CAXA"))
-                         {
-                             return false;
-                         }
+                     /*   var ret = NativeMethods.EnumWindows((hWnd, lParam) =>
+                        {
+                            StringBuilder GetText = new StringBuilder(256);
+                            NativeMethods.GetWindowTextW(hWnd, GetText, 256);
+                            if (GetText.ToString().StartsWith("CAXA"))
+                            {
+                                return false;
+                            }
 
-                         return true;
-                     }, 0);
+                            return true;
+                        }, 0);*/
+                     bool ret = false;
+                     StringBuilder GetText = new StringBuilder(256);
+                     NativeMethods.GetWindowTextW(NativeMethods.GetForegroundWindow(IntPtr.Zero), GetText, 256);
+                     if (!GetText.ToString().StartsWith("CAXA"))
+                     {
+                         ret = true;
+                     }
                      if (!ret && ClipboardChange?.Status != TaskStatus.Running)
                      {
                          StartClipboardChange();
                      }
                      else if (!ret && ClipboardChange?.Status == TaskStatus.Running)
                      {
-                         Thread.Sleep(5000);
-                         continue;
+                         Thread.Sleep(500);
                      }
                      else
                      {
-                         if (ClipboardChange?.Status == TaskStatus.Running)
+                         if (CheckStartClipboardChange)
                          {
                              CancelInfoClipboard.Cancel();
                          }
                          if (!CancelInfoMonitor.IsCancellationRequested)
-                             Thread.Sleep(5000);
+                             Thread.Sleep(500);
                      }
                  }
              });
@@ -148,7 +171,7 @@ namespace ClipboardControl
         }
 
         private Task ClipboardChange;
-
+        private bool CheckStartClipboardChange;
         private void StartClipboardChange()
         {
             CancelInfoClipboard = new CancellationTokenSource();
@@ -159,6 +182,7 @@ namespace ClipboardControl
                    var LastS = string.Empty;
                    while (!CancelInfoClipboard.IsCancellationRequested)
                    {
+                       CheckStartClipboardChange = true;
                        var Temp = ClipboardControl.GetText(ClipboardFormat.CF_UNICODETEXT);
                        if (!string.IsNullOrEmpty(Temp) && Temp != LastS)
                        {
@@ -243,7 +267,7 @@ namespace ClipboardControl
         {
             if (e.Button == MouseButtons.Right)
             {
-                contextMenuStrip1.Show(e.X, e.Y);
+                剪切板监控.ContextMenuStrip = contextMenuStrip1;
             }
         }
     }
