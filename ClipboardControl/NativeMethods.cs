@@ -29,7 +29,7 @@ namespace ClipboardControl
         [DllImport("User32", CharSet = CharSet.Unicode)]
         internal static extern IntPtr SetClipboardData(int uFormat, IntPtr hMem);
 
-        #endregion
+        #endregion Clipboard
 
         //查找窗体
         [DllImport("User32.dll", EntryPoint = "FindWindow")]
@@ -38,16 +38,22 @@ namespace ClipboardControl
         [DllImport("User32.dll", EntryPoint = "FindWindowEx")]
         public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpClassName,
             string lpWindowName);
+
         public delegate bool CallBack(IntPtr hwnd, IntPtr lParam);
+
         [DllImport("user32")]
         public static extern bool EnumWindows(CallBack hwnd, int uCmd);
+
         [DllImport("user32.dll")]
         public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
         [DllImport("user32.dll")]
         public static extern int GetWindowTextW(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder lpString, int nMaxCount);
+
         [DllImport("user32.dll")]
         public static extern int GetClassNameW(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetTopWindow(IntPtr hWnd);
     }
-
-
 }

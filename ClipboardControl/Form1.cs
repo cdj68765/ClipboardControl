@@ -26,6 +26,7 @@ namespace ClipboardControl
                 AutoRun.CheckState = CheckState.Checked;
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
+                AutoRun.Enabled = false;
                 剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
                 CancelInfoMonitor = new CancellationTokenSource();
                 StartMonitor();
@@ -164,6 +165,13 @@ namespace ClipboardControl
                            ClipboardControl.SetText(Temp);
                            LastS = Temp;
                        }
+                       if (AutoRun.Checked)
+                       {
+                           if (ClipboardTask?.IsAlive != true)
+                           {
+                               break;
+                           }
+                       }
 
                        Thread.Sleep(50);
                    }
@@ -180,6 +188,7 @@ namespace ClipboardControl
 
             if (Start.Text == "启动")
             {
+                AutoRun.Enabled = false;
                 if (AutoRun.Checked)
                 {
                     if (ClipboardTask?.IsAlive != true)
@@ -198,6 +207,7 @@ namespace ClipboardControl
             }
             else
             {
+                AutoRun.Enabled = true;
                 if (ClipboardTask?.IsAlive == true)
                 {
                     ClipboardTask.Abort();

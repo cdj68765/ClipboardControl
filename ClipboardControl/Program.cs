@@ -13,6 +13,7 @@ namespace ClipboardControl
     {
         private static void Main(string[] args)
         {
+            var tt = NativeMethods.GetTopWindow(IntPtr.Zero);
             Mutex Pro = new Mutex(true, "ClipboardControl", out bool Close);
             if (!Close) return;
             if (NativeMethods.EnumWindows((hWnd, lParam) =>
