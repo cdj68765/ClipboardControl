@@ -9,8 +9,6 @@ namespace ClipboardControl
 {
     internal class ClipboardControl
     {
-
-
         internal static void SetText(string text)
         {
             NativeMethods.OpenClipboard(IntPtr.Zero);
@@ -30,13 +28,9 @@ namespace ClipboardControl
                 {
                     value = Marshal.PtrToStringUni(ptr);
                 }
-
-                NativeMethods.CloseClipboard();
             }
-
+            NativeMethods.CloseClipboard();
             return value;
         }
     }
-
 }
-

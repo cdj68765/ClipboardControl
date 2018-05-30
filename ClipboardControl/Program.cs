@@ -9,11 +9,25 @@ using System.Windows.Forms;
 
 namespace ClipboardControl
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
+            Mutex Pro = new Mutex(true, "ClipboardControl", out bool Close);
+            if (!Close) return;
+            if (NativeMethods.EnumWindows((hWnd, lParam) =>
+                     {
+                         StringBuilder GetText = new StringBuilder(256);
+                         NativeMethods.GetWindowTextW(hWnd, GetText, 256);
+                         if (GetText.ToString().StartsWith("ClipboardControl"))
+                         {
+                             return false;
+                         }
+
+                         return true;
+                     }, 0)) return;
             Application.Run(new Form1());
+            Application.Exit();
         }
     }
 }

@@ -31,17 +31,37 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.剪切板监控 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.退出 = new System.Windows.Forms.ToolStripMenuItem();
             this.Start = new System.Windows.Forms.Button();
             this.Status = new System.Windows.Forms.Label();
             this.AutoRun = new System.Windows.Forms.CheckBox();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // 剪切板监控
             // 
+            this.剪切板监控.ContextMenuStrip = this.contextMenuStrip1;
             this.剪切板监控.Icon = ((System.Drawing.Icon)(resources.GetObject("剪切板监控.Icon")));
             this.剪切板监控.Text = "剪切板监控";
             this.剪切板监控.Visible = true;
             this.剪切板监控.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.剪切板监控_MouseDoubleClick);
+            this.剪切板监控.MouseDown += new System.Windows.Forms.MouseEventHandler(this.剪切板监控_MouseDown);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.退出});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.ShowImageMargin = false;
+            this.contextMenuStrip1.Size = new System.Drawing.Size(76, 26);
+            // 
+            // 退出
+            // 
+            this.退出.Name = "退出";
+            this.退出.Size = new System.Drawing.Size(75, 22);
+            this.退出.Text = "退出";
+            this.退出.Click += new System.EventHandler(this.退出_Click);
             // 
             // Start
             // 
@@ -90,6 +110,7 @@
             this.MinimumSize = new System.Drawing.Size(300, 125);
             this.Name = "Form1";
             this.Text = "Caxa剪切板监控";
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -101,5 +122,7 @@
         private System.Windows.Forms.Button Start;
         private System.Windows.Forms.Label Status;
         private System.Windows.Forms.CheckBox AutoRun;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 退出;
     }
 }

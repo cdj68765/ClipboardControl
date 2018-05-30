@@ -21,15 +21,12 @@ namespace ClipboardControl
         public Form1()
         {
             InitializeComponent();
-            if (Properties.Settings.Default.DateCollect == null)
-            {
-                Properties.Settings.Default.DateCollect = new Hashtable();
-            }
             if (Properties.Settings.Default.AutoRun)
             {
                 AutoRun.CheckState = CheckState.Checked;
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
+                剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
                 CancelInfoMonitor = new CancellationTokenSource();
                 StartMonitor();
             }
@@ -42,103 +39,110 @@ namespace ClipboardControl
                 }
             };
             CancellationTokenSource CloseCheck = new CancellationTokenSource();
-             LoopStatus = new Thread(() =>
-            {
-                do
-                {
-                    if (AutoRun.Checked || ClipboardTask?.IsAlive == true)
-                    {
-                        if (ClipboardTask?.IsAlive == true)
-                        {
-                            Invoke(new Action(() =>
-                            {
-                                Status.Text = @"运行中....";
-                                Status.ForeColor = Color.Green;
-                                Start.Text = @"关闭";
-                            }));
+            LoopStatus = new Thread(() =>
+           {
+               do
+               {
+                   if (AutoRun.Checked || ClipboardTask?.IsAlive == true)
+                   {
+                       if (ClipboardTask?.IsAlive == true)
+                       {
+                           Invoke(new Action(() =>
+                           {
+                               Status.Text = @"运行中....";
+                               Status.ForeColor = Color.Green;
+                               Start.Text = @"关闭";
+                               剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
+                           }));
+                       }
+                       else if (ClipboardTask?.IsAlive != true && ClipboardChange?.Status != TaskStatus.Running)
+                       {
+                           Invoke(new Action(() =>
+                           {
+                               Status.Text = @"关闭中....";
+                               Status.ForeColor = Color.Red;
+                               CancelInfoClipboard.Cancel();
+                               Start.Text = @"启动";
+                               剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
+                           }));
+                       }
+                   }
+                   else
+                   {
+                       if (ClipboardChange?.Status == TaskStatus.Running)
+                       {
+                           Invoke(new Action(() =>
+                           {
+                               剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
+                               Status.Text = @"运行中....";
+                               Status.ForeColor = Color.Green;
+                               Start.Text = @"关闭";
+                           }));
+                       }
+                       else
+                       {
+                           Invoke(new Action(() =>
+                           {
+                               Status.Text = @"关闭中....";
+                               Status.ForeColor = Color.Red;
+                               Start.Text = @"启动";
+                               剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
+                           }));
+                       }
+                   }
 
-                        }
-                        else if (ClipboardTask?.IsAlive != true)
-                        {
-                            Invoke(new Action(() =>
-                            {
-                                Status.Text = @"关闭中....";
-                                Status.ForeColor = Color.Red;
-                                CancelInfoClipboard.Cancel();
-                                Start.Text = @"启动";
-                            }));
-
-                        }
-                    }
-                    else
-                    {
-
-                        if (ClipboardChange?.Status == TaskStatus.Running)
-                        {
-                            Invoke(new Action(() =>
-                            {
-                                Status.Text = @"运行中....";
-                                Status.ForeColor = Color.Green;
-                                Start.Text = @"关闭";
-                            }));
-                        }
-                        else
-                        {
-                            Invoke(new Action(() =>
-                            {
-                                Status.Text = @"关闭中....";
-                                Status.ForeColor = Color.Red;
-                                Start.Text = @"启动";
-                            }));
-                        }
-                    }
-
-
-                    Thread.Sleep(500);
-                } while (!CloseCheck.IsCancellationRequested);
-            });
+                   Thread.Sleep(500);
+               } while (!CloseCheck.IsCancellationRequested);
+           });
             this.FormClosing += delegate
             {
                 Properties.Settings.Default.AutoRun = AutoRun.Checked;
                 Properties.Settings.Default.Save();
                 CloseCheck.Cancel();
-                LoopStatus.Abort();
+                LoopStatus?.Abort();
+                ClipboardTask?.Abort();
             };
         }
 
         private Thread ClipboardTask;
+
         private void StartMonitor()
         {
-            ClipboardTask =new Thread(() =>
-            {
-                while (!CancelInfoMonitor.IsCancellationRequested)
-                {
-                    var ret = NativeMethods.EnumWindows((hWnd, lParam) =>
-                    {
-                        StringBuilder GetText = new StringBuilder(256);
-                        NativeMethods.GetWindowTextW(hWnd, GetText, 256);
-                        if (GetText.ToString().StartsWith("CAXA"))
-                        {
-                            return false;
-                        }
+            ClipboardTask = new Thread(() =>
+             {
+                 while (!CancelInfoMonitor.IsCancellationRequested)
+                 {
+                     var ret = NativeMethods.EnumWindows((hWnd, lParam) =>
+                     {
+                         StringBuilder GetText = new StringBuilder(256);
+                         NativeMethods.GetWindowTextW(hWnd, GetText, 256);
+                         if (GetText.ToString().StartsWith("CAXA"))
+                         {
+                             return false;
+                         }
 
-                        return true;
-                    }, 0);
-                    if (!ret&& ClipboardChange?.Status != TaskStatus.Running)
-                    {
-                        StartClipboardChange();
-                    }
-                    else
-                    {
-                        if (ClipboardChange?.Status == TaskStatus.Running)
-                        {
-                            CancelInfoClipboard.Cancel();
-                        }
-                        if(!CancelInfoMonitor.IsCancellationRequested)
-                        Thread.Sleep(5000);
-                    }
-                }
-            });
+                         return true;
+                     }, 0);
+                     if (!ret && ClipboardChange?.Status != TaskStatus.Running)
+                     {
+                         StartClipboardChange();
+                     }
+                     else if (!ret && ClipboardChange?.Status == TaskStatus.Running)
+                     {
+                         Thread.Sleep(5000);
+                         continue;
+                     }
+                     else
+                     {
+                         if (ClipboardChange?.Status == TaskStatus.Running)
+                         {
+                             CancelInfoClipboard.Cancel();
+                         }
+                         if (!CancelInfoMonitor.IsCancellationRequested)
+                             Thread.Sleep(5000);
+                     }
+                 }
+             });
             ClipboardTask.Start();
         }
 
@@ -148,37 +152,24 @@ namespace ClipboardControl
         {
             CancelInfoClipboard = new CancellationTokenSource();
 
-            ClipboardChange =  Task.Factory.StartNew(() =>
-            {
-                {
-                    var LastS = string.Empty;
-                    while (!CancelInfoClipboard.IsCancellationRequested)
-                    {
-                        var Temp = ClipboardControl.GetText(ClipboardFormat.CF_UNICODETEXT);
-                        if (!string.IsNullOrEmpty(Temp) && Temp != LastS)
-                        {
-                            ThreadPool.QueueUserWorkItem((object state) =>
-                            {
-                                if (Properties.Settings.Default.DateCollect.Contains(Temp))
-                                {
-                                    Properties.Settings.Default.DateCollect[Temp] =
-                                     (int.Parse(Properties.Settings.Default.DateCollect[Temp].ToString()) + 1).ToString();
-                                }
-                                else
-                                {
-                                    Properties.Settings.Default.DateCollect.Add(Temp, 0);
-                                }
-                            });
-                            ClipboardControl.SetText(Temp);
-                            LastS = Temp;
-                        }
+            ClipboardChange = Task.Factory.StartNew(() =>
+           {
+               {
+                   var LastS = string.Empty;
+                   while (!CancelInfoClipboard.IsCancellationRequested)
+                   {
+                       var Temp = ClipboardControl.GetText(ClipboardFormat.CF_UNICODETEXT);
+                       if (!string.IsNullOrEmpty(Temp) && Temp != LastS)
+                       {
+                           ClipboardControl.SetText(Temp);
+                           LastS = Temp;
+                       }
 
-                        Thread.Sleep(100);
-                    }
-                }
-            });
+                       Thread.Sleep(50);
+                   }
+               }
+           });
         }
-
 
         private void Start_Click(object sender, EventArgs e)
         {
@@ -196,7 +187,6 @@ namespace ClipboardControl
                         CancelInfoMonitor = new CancellationTokenSource();
                         StartMonitor();
                     }
-
                 }
                 else
                 {
@@ -208,13 +198,10 @@ namespace ClipboardControl
             }
             else
             {
-
                 if (ClipboardTask?.IsAlive == true)
                 {
                     ClipboardTask.Abort();
-
                 }
-
                 else
                 {
                     if (ClipboardChange?.Status == TaskStatus.Running)
@@ -227,6 +214,7 @@ namespace ClipboardControl
 
         private void 剪切板监控_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Right) return;
             if (LoopStatus.IsAlive != true)
             {
                 LoopStatus.Start();
@@ -234,6 +222,19 @@ namespace ClipboardControl
             this.Visible = true;
             WindowState = FormWindowState.Normal;
             ShowInTaskbar = true;
+        }
+
+        private void 退出_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void 剪切板监控_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                contextMenuStrip1.Show(e.X, e.Y);
+            }
         }
     }
 }

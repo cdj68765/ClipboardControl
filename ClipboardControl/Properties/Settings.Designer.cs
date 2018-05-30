@@ -34,16 +34,5 @@ namespace ClipboardControl.Properties {
                 this["AutoRun"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Hashtable DateCollect {
-            get {
-                return ((global::System.Collections.Hashtable)(this["DateCollect"]));
-            }
-            set {
-                this["DateCollect"] = value;
-            }
-        }
     }
 }
