@@ -35,8 +35,6 @@
             this.退出 = new System.Windows.Forms.ToolStripMenuItem();
             this.Start = new System.Windows.Forms.Button();
             this.Status = new System.Windows.Forms.Label();
-            this.AutoRun = new System.Windows.Forms.CheckBox();
-            this.Monitor = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,8 +43,6 @@
             this.剪切板监控.Icon = ((System.Drawing.Icon)(resources.GetObject("剪切板监控.Icon")));
             this.剪切板监控.Text = "剪切板监控";
             this.剪切板监控.Visible = true;
-            this.剪切板监控.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.剪切板监控_MouseDoubleClick);
-            this.剪切板监控.MouseDown += new System.Windows.Forms.MouseEventHandler(this.剪切板监控_MouseDown);
             // 
             // contextMenuStrip1
             // 
@@ -62,7 +58,6 @@
             this.退出.Name = "退出";
             this.退出.Size = new System.Drawing.Size(75, 22);
             this.退出.Text = "退出";
-            this.退出.Click += new System.EventHandler(this.退出_Click);
             // 
             // Start
             // 
@@ -73,7 +68,6 @@
             this.Start.TabIndex = 0;
             this.Start.Text = "启动";
             this.Start.UseVisualStyleBackColor = true;
-            this.Start.Click += new System.EventHandler(this.Start_Click);
             // 
             // Status
             // 
@@ -86,34 +80,11 @@
             this.Status.TabIndex = 1;
             this.Status.Text = "未启动";
             // 
-            // AutoRun
-            // 
-            this.AutoRun.AutoSize = true;
-            this.AutoRun.Location = new System.Drawing.Point(121, 57);
-            this.AutoRun.Name = "AutoRun";
-            this.AutoRun.Size = new System.Drawing.Size(48, 16);
-            this.AutoRun.TabIndex = 2;
-            this.AutoRun.Text = "自动";
-            this.AutoRun.UseVisualStyleBackColor = true;
-            // 
-            // Monitor
-            // 
-            this.Monitor.AutoSize = true;
-            this.Monitor.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Monitor.ForeColor = System.Drawing.Color.Red;
-            this.Monitor.Location = new System.Drawing.Point(117, 34);
-            this.Monitor.Name = "Monitor";
-            this.Monitor.Size = new System.Drawing.Size(49, 20);
-            this.Monitor.TabIndex = 3;
-            this.Monitor.Text = "等待";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 86);
-            this.Controls.Add(this.AutoRun);
-            this.Controls.Add(this.Monitor);
             this.Controls.Add(this.Status);
             this.Controls.Add(this.Start);
             this.DoubleBuffered = true;
@@ -134,9 +105,7 @@
         private System.Windows.Forms.NotifyIcon 剪切板监控;
         private System.Windows.Forms.Button Start;
         private System.Windows.Forms.Label Status;
-        private System.Windows.Forms.CheckBox AutoRun;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 退出;
-        private System.Windows.Forms.Label Monitor;
     }
 }

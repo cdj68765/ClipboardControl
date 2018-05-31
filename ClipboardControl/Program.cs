@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using System.Windows.Forms;
 
 namespace ClipboardControl
@@ -13,7 +7,7 @@ namespace ClipboardControl
     {
         private static void Main(string[] args)
         {
-            Mutex Pro = new Mutex(true, "ClipboardControl", out bool Close);
+            var Pro = new Mutex(true, "ClipboardControl", out var Close);
             if (!Close) return;
             /*   if (NativeMethods.EnumWindows((hWnd, lParam) =>
                         {

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace ClipboardControl
 {
@@ -11,24 +8,27 @@ namespace ClipboardControl
     {
         internal static void SetText(string text)
         {
-            NativeMethods.OpenClipboard(IntPtr.Zero);
+            if (!NativeMethods.OpenClipboard(IntPtr.Zero))
+            {
+                SetText(text);
+                Thread.Sleep(50);
+                return;
+            }
             NativeMethods.EmptyClipboard();
-            NativeMethods.SetClipboardData(ClipboardFormat.CF_UNICODETEXT, Marshal.StringToHGlobalUni(text));
+            NativeMethods.SetClipboardData(ClipboardFormat.CF_UNICODETEXT, Marshal.StringToCoTaskMemAuto(text));
             NativeMethods.CloseClipboard();
         }
 
         internal static string GetText(int format)
         {
-            string value = string.Empty;
+            var value = string.Empty;
             NativeMethods.OpenClipboard(IntPtr.Zero);
             if (NativeMethods.IsClipboardFormatAvailable(format))
             {
-                IntPtr ptr = NativeMethods.GetClipboardData(format);
-                if (ptr != IntPtr.Zero)
-                {
-                    value = Marshal.PtrToStringUni(ptr);
-                }
+                var ptr = NativeMethods.GetClipboardData(format);
+                if (ptr != IntPtr.Zero) value = Marshal.PtrToStringUni(ptr);
             }
+
             NativeMethods.CloseClipboard();
             return value;
         }
