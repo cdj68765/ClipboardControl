@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace ClipboardControl
                 WindowState = FormWindowState.Minimized;
                 ShowInTaskbar = false;
                 AutoRun.Enabled = false;
-              
+
                 CancelInfoMonitor = new CancellationTokenSource();
                 StartMonitor();
             }
@@ -42,76 +43,73 @@ namespace ClipboardControl
             CancellationTokenSource CloseCheck = new CancellationTokenSource();
             LoopStatus = new Thread(() =>
             {
-               do
-               {
-                   if (AutoRun.Checked || ClipboardTask?.IsAlive == true)
-                   {
-                       if (ClipboardTask?.IsAlive == true)
-                       {
-                           Invoke(new Action(() =>
-                           {
-                               Status.Text = @"运行中....";
-                               Status.ForeColor = Color.Green;
-                               Start.Text = @"关闭";
-                           }));
-                       }
-                       else if (ClipboardTask?.IsAlive != true && ClipboardChange?.Status != TaskStatus.Running)
-                       {
-                           Invoke(new Action(() =>
-                           {
-                               Status.Text = @"关闭中....";
-                               Status.ForeColor = Color.Red;
-                               CancelInfoClipboard.Cancel();
-                               Start.Text = @"启动";
-                           }));
-                       }
-                   }
-                   else
-                   {
-                       if (ClipboardChange?.Status == TaskStatus.Running)
-                       {
-                           Invoke(new Action(() =>
-                           {
-                               Status.Text = @"运行中....";
-                               Status.ForeColor = Color.Green;
-                               Start.Text = @"关闭";
-                           }));
-                       }
-                       else
-                       {
-                           Invoke(new Action(() =>
-                           {
-                               Status.Text = @"关闭中....";
-                               Status.ForeColor = Color.Red;
-                               Start.Text = @"启动";
-                              
-                           }));
-                       }
-                   }
-                   if (CheckStartClipboardChange)
-                   {
-                       Invoke(new Action(() =>
-                       {
-                           Monitor.Text = @"剪切板监控中";
-                           Monitor.ForeColor = Color.Green;
-                           CheckStartClipboardChange = false;
-                           剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
-                       }));
-
-                   }
-                   else
-                   {
-                       Invoke(new Action(() =>
-                       {
-                           Monitor.Text = @"剪切板未监控";
-                           Monitor.ForeColor = Color.Red;
-                           剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
-
-                       }));
-                   }
+                do
+                {
+                    if (AutoRun.Checked || ClipboardTask?.IsAlive == true)
+                    {
+                        if (ClipboardTask?.IsAlive == true)
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                Status.Text = @"运行中....";
+                                Status.ForeColor = Color.Green;
+                                Start.Text = @"关闭";
+                            }));
+                        }
+                        else if (ClipboardTask?.IsAlive != true && ClipboardChange?.Status != TaskStatus.Running)
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                Status.Text = @"关闭中....";
+                                Status.ForeColor = Color.Red;
+                                CancelInfoClipboard.Cancel();
+                                Start.Text = @"启动";
+                            }));
+                        }
+                    }
+                    else
+                    {
+                        if (ClipboardChange?.Status == TaskStatus.Running)
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                Status.Text = @"运行中....";
+                                Status.ForeColor = Color.Green;
+                                Start.Text = @"关闭";
+                            }));
+                        }
+                        else
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                Status.Text = @"关闭中....";
+                                Status.ForeColor = Color.Red;
+                                Start.Text = @"启动";
+                            }));
+                        }
+                    }
+                    if (CheckStartClipboardChange)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Monitor.Text = @"剪切板监控中";
+                            Monitor.ForeColor = Color.Green;
+                            CheckStartClipboardChange = false;
+                            剪切板监控.Icon = Resource1.clipboard_80px_1121225_easyicon_net;
+                        }));
+                    }
+                    else
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Monitor.Text = @"剪切板未监控";
+                            Monitor.ForeColor = Color.Red;
+                            剪切板监控.Icon = Resource1.Clipboard_Plan_128px_1185105_easyicon_net;
+                        }));
+                    }
                     Thread.Sleep(500);
-               } while (!CloseCheck.IsCancellationRequested);
-           });
+                } while (!CloseCheck.IsCancellationRequested);
+            });
             this.FormClosing += delegate
             {
                 Properties.Settings.Default.AutoRun = AutoRun.Checked;
@@ -120,6 +118,11 @@ namespace ClipboardControl
                 LoopStatus?.Abort();
                 ClipboardTask?.Abort();
             };
+
+            if (LoopStatus?.IsAlive != true)
+            {
+                LoopStatus.Start();
+            }
         }
 
         private Thread ClipboardTask;
@@ -130,6 +133,7 @@ namespace ClipboardControl
              {
                  while (!CancelInfoMonitor.IsCancellationRequested)
                  {
+                     GC.Collect();
                      /*   var ret = NativeMethods.EnumWindows((hWnd, lParam) =>
                         {
                             StringBuilder GetText = new StringBuilder(256);
@@ -143,14 +147,16 @@ namespace ClipboardControl
                         }, 0);*/
                      bool ret = false;
                      StringBuilder GetText = new StringBuilder(256);
-                     NativeMethods.GetWindowTextW(NativeMethods.GetForegroundWindow(IntPtr.Zero), GetText, 256);
+                     var HMD = NativeMethods.GetWindowTextW(NativeMethods.GetForegroundWindow(IntPtr.Zero), GetText, 256);
                      if (!GetText.ToString().StartsWith("CAXA"))
                      {
                          ret = true;
                      }
+                     GetText.Clear();
                      if (!ret && ClipboardChange?.Status != TaskStatus.Running)
                      {
                          StartClipboardChange();
+                         Console.WriteLine("Start");
                      }
                      else if (!ret && ClipboardChange?.Status == TaskStatus.Running)
                      {
@@ -172,6 +178,7 @@ namespace ClipboardControl
 
         private Task ClipboardChange;
         private bool CheckStartClipboardChange;
+
         private void StartClipboardChange()
         {
             CancelInfoClipboard = new CancellationTokenSource();
@@ -180,6 +187,7 @@ namespace ClipboardControl
            {
                {
                    var LastS = string.Empty;
+                   int Count = 0;
                    while (!CancelInfoClipboard.IsCancellationRequested)
                    {
                        CheckStartClipboardChange = true;
@@ -189,6 +197,18 @@ namespace ClipboardControl
                            ClipboardControl.SetText(Temp);
                            LastS = Temp;
                        }
+                       else if (Temp == LastS)
+                       {
+                           if (Count == 5)
+                           {
+                               ClipboardControl.SetText(Temp);
+                               Count = 0;
+                           }
+                           else
+                           {
+                               Count += 1;
+                           }
+                       }
                        if (AutoRun.Checked)
                        {
                            if (ClipboardTask?.IsAlive != true)
@@ -196,7 +216,6 @@ namespace ClipboardControl
                                break;
                            }
                        }
-
                        Thread.Sleep(50);
                    }
                }
@@ -205,11 +224,6 @@ namespace ClipboardControl
 
         private void Start_Click(object sender, EventArgs e)
         {
-            if (LoopStatus?.IsAlive != true)
-            {
-                LoopStatus.Start();
-            }
-
             if (Start.Text == "启动")
             {
                 AutoRun.Enabled = false;

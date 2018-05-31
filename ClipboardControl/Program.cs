@@ -15,17 +15,17 @@ namespace ClipboardControl
         {
             Mutex Pro = new Mutex(true, "ClipboardControl", out bool Close);
             if (!Close) return;
-            if (NativeMethods.EnumWindows((hWnd, lParam) =>
-                     {
-                         StringBuilder GetText = new StringBuilder(256);
-                         NativeMethods.GetWindowTextW(hWnd, GetText, 256);
-                         if (GetText.ToString().StartsWith("ClipboardControl"))
-                         {
-                             return false;
-                         }
+            /*   if (NativeMethods.EnumWindows((hWnd, lParam) =>
+                        {
+                            StringBuilder GetText = new StringBuilder(256);
+                            NativeMethods.GetWindowTextW(hWnd, GetText, 256);
+                            if (GetText.ToString().StartsWith("ClipboardControl"))
+                            {
+                                return false;
+                            }
 
-                         return true;
-                     }, 0)) return;
+                            return true;
+                        }, 0)) return;*/
             Application.Run(new Form1());
             Application.Exit();
         }
